@@ -80,8 +80,6 @@
         attribute vec3 aVertexPosition;
         varying vec3 vTexCoord;
 
-        varying vec3 vTexCoord;
-
         void main() {
             vTexCoord = aVertexPosition; // Pass position as texture coordinates
             gl_Position = vec4(aVertexPosition, 1.0);

@@ -82,43 +82,25 @@ function initCubemapBuffers() {
 }
 
 function createCubeMap(gl, images) {
-    // Create a cube map texture
-    if (!images || images.length !== 6) {
-        console.error("Invalid images array. Ensure all 6 faces of the cubemap are loaded.");
-        return;
-    }
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
 
-    const cubeMapTexture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMapTexture);
-
-    // Define the cube map faces in order
-    const cubeMapFaces = [
-        gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-        gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-        gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-        gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-        gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-        gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
+    const faces = [
+        gl.TEXTURE_CUBE_MAP_POSITIVE_X, gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+        gl.TEXTURE_CUBE_MAP_POSITIVE_Y, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        gl.TEXTURE_CUBE_MAP_POSITIVE_Z, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
     ];
 
-    // Load each image into the corresponding cube map face
-    cubeMapFaces.forEach((face, index) => {
-        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[index]);
+    faces.forEach((face, i) => {
+        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[i]);
     });
 
-    // Set texture parameters
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    //gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
-    console.log("TEXTURE_CUBE_MAP:", gl.TEXTURE_CUBE_MAP);
-    console.log("TEXTURE_MIN_FILTER:", gl.TEXTURE_MIN_FILTER);
-    console.log("TEXTURE_MAG_FILTER:", gl.TEXTURE_MAG_FILTER);
-    console.log("CLAMP_TO_EDGE:", gl.CLAMP_TO_EDGE);
 
-
-    return cubeMapTexture;
+    return texture;
 }
 
 // Usage example
@@ -160,54 +142,6 @@ function loadCubeMap(gl, callback) {
         });
 
 
-}
-function drawCubemap() {
-    if (!cubeMapTexture) {
-        console.error("Cube map texture not available.");
-        stopTick = true; // Stop rendering
-        return;
-    }
-
-    // Bind the vertex buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
-
-    // Validate the vertex position attribute
-    if (currentProgram.vertexPositionAttribute === -1) {
-        console.error("Vertex position attribute is not valid.");
-        stopTick = true; // Stop rendering
-        return;
-    }
-
-    // Set vertex attribute pointer
-    gl.vertexAttribPointer(
-        currentProgram.vertexPositionAttribute,
-        3,             // Number of components per vertex
-        gl.FLOAT,      // Data type
-        false,         // Normalized?
-        0,             // Stride
-        0              // Offset
-    );
-
-    // Enable the vertex attribute
-    gl.enableVertexAttribArray(currentProgram.vertexPositionAttribute);
-
-    // Check if the attribute is enabled
-    console.log(
-        "Vertex Position Attribute Enabled:",
-        gl.getVertexAttrib(currentProgram.vertexPositionAttribute, gl.VERTEX_ATTRIB_ARRAY_ENABLED)
-    );
-    // Bind cubemap texture
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMapTexture);
-    gl.uniform1i(currentProgram.environmentMapUniform, 0);
-
-    // Render the cube
-    try {
-        gl.drawArrays(gl.TRIANGLES, 0, 36); // Draw 36 vertices
-    } catch (error) {
-        console.error("Error during drawArrays:", error);
-        stopTick = true; // Stop rendering
-    }
 }
 
 /*
@@ -350,10 +284,27 @@ var draw_light = false;
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+    gl.depthMask(false);
     if (drawCubemapBackground && cubeMapTexture) {
-        drawCubemap();
+        gl.useProgram(shaderPrograms[shaderPrograms.length - 1]); // Use the last shader program
+        setUniforms(shaderPrograms[shaderPrograms.length - 1]);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
+        gl.vertexAttribPointer(
+            shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute,
+            3,
+            gl.FLOAT,
+            false,
+            0,
+            0
+        );
+        gl.enableVertexAttribArray(shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute);
+
+        // Render the cube
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+
     }
+    gl.depthMask(true);
 
     mat4.perspective(35, gl.viewportWidth/gl.viewportHeight, 0.1, 1000.0, pMatrix);
 
@@ -420,11 +371,11 @@ function tick() {
         const error = gl.getError(); // Check for WebGL errors
         if (error !== gl.NO_ERROR) {
             console.error("WebGL Error during rendering:", error);
-            stopTick = true; // Stop rendering on error
+            //stopTick = true; // Stop rendering on error
         }
     } catch (error) {
         console.error("Error during rendering:", error);
-        stopTick = true; // Stop rendering on error
+        //stopTick = true; // Stop rendering on error
     }
 }
 
