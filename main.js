@@ -27,6 +27,8 @@ function changeActiveShader(sel) {
         case 7: // Microfacet
             $(".microfacet-panel").css("display", "");
             break;
+        case 8: // Metallic
+            $(".phong-panel").css("display", ""); // Reuse microfacet controls
         default:
             // For shaders without cubemap support
             console.warn("Cubemap rendering may not apply for selected shader.");

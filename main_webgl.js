@@ -192,6 +192,7 @@ function initShaders() {
         createShader("shader-vs", "shader-fs3-1"),
         createShader("shader-vs", "shader-fs3-2"),
         createShader("shader-vs", "shader-fs4"),
+        createShader("shader-vs", "shader-fs-metallic"), // 这里。。。。。。
     ];
     currentProgram = shaderPrograms[0];
 
@@ -219,6 +220,11 @@ function initShaders() {
     gl.useProgram(shaderPrograms[7]);
     gl.uniform1f(shaderPrograms[7].iorUniform, 5.0);
     gl.uniform1f(shaderPrograms[7].betaUniform, 0.2);
+
+    //metal 这里！！！！！！！！！！！！！！！
+    shaderPrograms[8].exponentUniform = gl.getUniformLocation(shaderPrograms[8], "uExponent");
+    gl.useProgram(shaderPrograms[8]);
+    gl.uniform1f(shaderPrograms[8].exponentUniform, 50.0);
 
     // Initializing light source drawing shader
     lightProgram = createShaderProg("shader-vs-light", "shader-fs-light");
