@@ -26,6 +26,10 @@ function changeActiveShader(sel) {
         case 7: // Microfacet
             $(".microfacet-panel").css("display", "");
             break;
+        case 9:// Metallic
+            $(".phong-panel").css("display", ""); // Reuse microfacet controls
+        case 1:
+            $(".phong-panel").css("display", ""); // Reuse microfacet controls
         default:
             // For shaders without cubemap support
             break;
@@ -45,8 +49,8 @@ function changeResolution(sel) {
         case 1:
             width = 800; height = 450; break;
 
-        case 2:
-            width = 960; height = 540; break;
+        // case 2:
+        //     width = 960; height = 540; break;
 
         default:
             alert("Unknown resolution!");

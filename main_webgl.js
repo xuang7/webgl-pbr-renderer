@@ -220,6 +220,17 @@ function initShaders() {
     gl.uniform1f(shaderPrograms[7].iorUniform, 5.0);
     gl.uniform1f(shaderPrograms[7].betaUniform, 0.2);
 
+    //metal 
+    shaderPrograms[9].exponentUniform = gl.getUniformLocation(shaderPrograms[9], "uExponent");
+    gl.useProgram(shaderPrograms[9]);
+    gl.uniform1f(shaderPrograms[9].exponentUniform, 50.0);
+
+    //metal 
+    shaderPrograms[1].exponentUniform = gl.getUniformLocation(shaderPrograms[1], "uExponent");
+    gl.useProgram(shaderPrograms[1]);
+    gl.uniform1f(shaderPrograms[1].exponentUniform, 50.0);
+
+
     // Initializing light source drawing shader
     lightProgram = createShaderProg("shader-vs-light", "shader-fs-light");
     lightProgram.vertexPositionAttribute = gl.getAttribLocation(lightProgram, "aVertexPosition");

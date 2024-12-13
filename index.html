@@ -116,17 +116,58 @@
     <!-- Fragment shader: metal (option 9) -->
     <script id="shader-fs-metal" type="x-shader/x-fragment">
         precision mediump float;
+        
+        uniform vec3 uLightPos;             
+        uniform float uLightPower;         
+        uniform vec3 uDiffuseColor;         
+        uniform vec3 uSpecularColor;        
+        uniform float uExponent;            
+        uniform float uAmbient;             
         uniform samplerCube uEnvironmentMap;
-
-        varying vec3 vPosition;
-        varying vec3 vNormal;
-
+        uniform bool useEnvironmentMap;      
+        
+        varying vec3 vPosition;              
+        varying vec3 vNormal;                
+        
         void main(void) {
-            // Placeholder: Metallic reflection could be implemented here
-            vec3 reflectedDir = reflect(normalize(vPosition), normalize(vNormal));
-            gl_FragColor = textureCube(uEnvironmentMap, reflectedDir);
+            vec3 lightDirection = uLightPos - vPosition;
+            float lightDistance = length(lightDirection);
+            vec3 normalizedLightDir = normalize(lightDirection);
+            vec3 normalizedNormal = normalize(vNormal);
+            vec3 viewDirection = normalize(-vPosition);
+            
+            float I = uLightPower / (1.0 + 0.1 * lightDistance * lightDistance);
+        
+            float diffuse = max(dot(normalizedNormal, normalizedLightDir), 0.0);
+            vec3 diffuseColor = uDiffuseColor * (I * diffuse * 0.2 + uAmbient); // 减弱漫反射
+        
+            vec3 reflectionDirection = reflect(-normalizedLightDir, normalizedNormal);
+            float specular = 0.0;
+            if (diffuse > 0.0) {
+                specular = pow(max(dot(viewDirection, reflectionDirection), 0.0), uExponent);
+            }
+            vec3 specularColor = uSpecularColor * I * specular;
+        
+            vec3 envColor = vec3(0.0);
+            if (useEnvironmentMap) {
+                vec3 reflectedDir = reflect(-viewDirection, normalizedNormal);
+                envColor = textureCube(uEnvironmentMap, reflectedDir).rgb;
+            }
+        
+            float stripe = abs(sin(vPosition.x * 8.0));  // 减少密度 (8.0 -> 更宽条纹)
+            stripe = smoothstep(0.3, 0.7, stripe);       // 扩大过渡范围 (0.3 和 0.7 控制模糊边界)
+            
+            // 控制条纹强度，让其不完全覆盖高光
+            float stripeStrength = 0.5;   
+            specularColor = mix(specularColor, specularColor * stripe, stripeStrength);
+
+            vec3 fragColor = diffuseColor + specularColor + envColor * 0.6; // 调整环境反射强度
+            gl_FragColor = vec4(fragColor, 1.0);
         }
     </script>
+        
+    
+        
 
     <!-- Fragment shader: white -->
     <script id="shader-fs0" type="x-shader/x-fragment">
@@ -137,21 +178,87 @@
         }
     </script>
 
-    <!-- Fragment shader: position -->
+    <!-- porcelain -->
     <script id="shader-fs1-1" type="x-shader/x-fragment">
-        precision mediump float;
-
-        varying vec3 vPosition;             // Vertex position (camera space)
-        varying vec3 vNormal;               // Vertex normal (camera space)
-
-        void main(void) {
-            // Dummy variable to ensure the use of all vertex attributes.
-            vec4 zero = vec4(vPosition + vNormal - vPosition - vNormal, 0.0);
-
-            // Task 1-1
-            gl_FragColor = vec4(abs(vPosition), 1.0);
-        }
-    </script>
+            precision mediump float;
+        
+            uniform vec3 uLightPos;            
+            uniform float uLightPower;         
+            uniform vec3 uDiffuseColor;         
+            uniform vec3 uSpecularColor;         
+            uniform float uAmbient;             
+            uniform samplerCube uEnvironmentMap;
+            uniform bool useEnvironmentMap;     
+            uniform float uRoughness;            
+            uniform float uMetallic;            
+        
+            varying vec3 vPosition;      
+            varying vec3 vNormal;    
+        
+            vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+                return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+            }
+        
+            float distributionGGX(vec3 N, vec3 H, float roughness) {
+                float a = roughness * roughness;
+                float a2 = a * a;
+                float NdotH = max(dot(N, H), 0.0);
+                float NdotH2 = NdotH * NdotH;
+        
+                float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+                return a2 / (3.14159265359 * denom * denom);
+            }
+        
+            float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+                float NdotV = max(dot(N, V), 0.0);
+                float NdotL = max(dot(N, L), 0.0);
+                float r = (roughness + 1.0);
+                float k = (r * r) / 8.0;
+        
+                float ggx1 = NdotV / (NdotV * (1.0 - k) + k);
+                float ggx2 = NdotL / (NdotL * (1.0 - k) + k);
+        
+                return ggx1 * ggx2;
+            }
+        
+            void main(void) {
+                vec3 N = normalize(vNormal);               
+                vec3 V = normalize(-vPosition);            
+                vec3 L = normalize(uLightPos - vPosition); 
+                vec3 H = normalize(V + L);                 
+        
+                float distance = length(uLightPos - vPosition);
+                float attenuation = 1.0 / (distance * distance);
+                float radiance = uLightPower * attenuation;
+        
+                vec3 F0 = mix(vec3(0.04), uSpecularColor, uMetallic);
+                vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        
+                float NDF = distributionGGX(N, H, uRoughness);
+        
+                float G = geometrySmith(N, V, L, uRoughness);
+        
+                vec3 numerator = NDF * G * F;
+                float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+                vec3 specular = numerator / denominator;
+        
+                vec3 kD = vec3(1.0) - F;
+                kD *= 1.0 - uMetallic;
+                vec3 diffuse = kD * uDiffuseColor / 3.14159265359;
+                vec3 envColor = vec3(0.0);
+                if (useEnvironmentMap) {
+                    vec3 reflectedDir = reflect(-V, N);
+                    reflectedDir = mix(reflectedDir, N, uRoughness);
+                    envColor = textureCube(uEnvironmentMap, reflectedDir).rgb;
+                }
+                float NdotL = max(dot(N, L), 0.0);
+                vec3 color = (diffuse + specular) * radiance * NdotL + envColor * uAmbient;
+        
+                gl_FragColor = vec4(color, 1.0);
+            }
+        </script>
+        
+    
 
     <!-- Fragment shader: normal -->
     <script id="shader-fs1-2" type="x-shader/x-fragment">
@@ -168,6 +275,7 @@
             vec3 normalizedNormal = normalize(vNormal);
             gl_FragColor = vec4(abs(normalizedNormal), 1.0);
         }
+
     </script>
 
     <!-- Fragment shader: lighting direction -->
@@ -449,7 +557,7 @@
                     <option value="0" selected="selected">Default: White</option>
                     <option value="8">Environment map</option>
                     <option value="9">Texture: Metal</option>
-                    <option value="1">Texture: Porcelain</option>
+                    <option value="1">Texture: Matte Porcelain </option>
                     <option value="2">Normal</option>
                     <option value="3">Lighting Dir.</option>
                     <option value="4">Diffuse Reflectance Model</option>
