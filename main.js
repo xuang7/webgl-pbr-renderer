@@ -14,8 +14,7 @@ function changeActiveShader(sel) {
 
     $("[class$='-panel']").css("display", "none");
 
-    // Update cubemap background flag
-    drawCubemapBackground = true;
+    //drawCubemapBackground = true;
 
     switch (id) {
         case 5: // Phong
@@ -27,11 +26,8 @@ function changeActiveShader(sel) {
         case 7: // Microfacet
             $(".microfacet-panel").css("display", "");
             break;
-        case 8: // Metallic
-            $(".phong-panel").css("display", ""); // Reuse microfacet controls
         default:
             // For shaders without cubemap support
-            console.warn("Cubemap rendering may not apply for selected shader.");
             break;
     }
 }
@@ -58,15 +54,14 @@ function changeResolution(sel) {
 
     if ( width > 0 ) {
         var canvas = $("#canvas0")[0];
-        
-        canvas.width = width; 
+
+        canvas.width = width;
         canvas.height = height;
 
         gl.viewportWidth = width;
         gl.viewportHeight = height;
     }
 }
-
 
 /*
  * Slider bar handlers
@@ -83,7 +78,7 @@ function updateSlider(sliderAmount) {
 
 function changeShowLightState(ifShow) {
     draw_light = ifShow;
-}    
+}
 
 function changeAnimatedLightState(ifAnimated) {
     animated_light = ifAnimated;
@@ -166,7 +161,7 @@ $(function() {
             $("#colorText").html(color.toHexString());
             diffuseColor = [color_.r/255.0, color_.g/255.0, color_.b/255.0];
 
-        }        
+        }
     });
 
     $("#specularColorPicker").spectrum({
@@ -178,10 +173,10 @@ $(function() {
         change: function(color) {
             var color_ = color.toRgb();
             $("#specularColorText").html(color.toHexString());
-    
+
             // Convert to normalized RGB and update specular color uniform
             var specularColor = [color_.r / 255.0, color_.g / 255.0, color_.b / 255.0];
-    
+
             // Set the uniform for the currently active shader program if it has uSpecularColor
             if (currentProgram.specularColorUniform) {
                 gl.useProgram(currentProgram);
@@ -189,7 +184,7 @@ $(function() {
             }
         }
     });
-    
+
 
 
 

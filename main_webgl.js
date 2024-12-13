@@ -1,18 +1,18 @@
-/* 
+/*
  * Initializing GL object
  */
 var gl;
-var drawCubemapBackground = true; // Enable cubemap background rendering by default
-var cubeVertexBuffer;
+//var drawCubemapBackground = true; // Enable cubemap background rendering by default
+//var cubeVertexBuffer;
 var cubeMapTexture;
-var cubeVertices = new Float32Array([
-    -1, -1, -1,  1, -1, -1,  1,  1, -1, -1,  1, -1, // Back face
-    -1, -1,  1, -1,  1,  1,  1,  1,  1,  1, -1,  1, // Front face
-    -1,  1, -1, -1,  1,  1,  1,  1,  1,  1,  1, -1, // Top face
-    -1, -1, -1,  1, -1, -1,  1, -1,  1, -1, -1,  1, // Bottom face
-    1, -1, -1,  1,  1, -1,  1,  1,  1,  1, -1,  1, // Right face
-    -1, -1, -1, -1, -1,  1, -1,  1,  1, -1,  1, -1  // Left face
-]);
+// var cubeVertices = new Float32Array([
+//     -1, -1, -1,  1, -1, -1,  1,  1, -1, -1,  1, -1, // Back face
+//     -1, -1,  1, -1,  1,  1,  1,  1,  1,  1, -1,  1, // Front face
+//     -1,  1, -1, -1,  1,  1,  1,  1,  1,  1,  1, -1, // Top face
+//     -1, -1, -1,  1, -1, -1,  1, -1,  1, -1, -1,  1, // Bottom face
+//     1, -1, -1,  1,  1, -1,  1,  1,  1,  1, -1,  1, // Right face
+//     -1, -1, -1, -1, -1,  1, -1,  1,  1, -1,  1, -1  // Left face
+// ]);
 
 function initGL(canvas) {
     try {
@@ -52,7 +52,7 @@ function initMesh() {
     // Transform for Teapot
     mat4.identity(meshTransforms[0]);
     mat4.rotateX(meshTransforms[0], -1.5708);
-    mat4.scale(meshTransforms[0], [0.15, 0.15, 0.15]);        
+    mat4.scale(meshTransforms[0], [0.15, 0.15, 0.15]);
 
     // Transform for Bunny
     mat4.identity(meshTransforms[1]);
@@ -73,13 +73,13 @@ function initMesh() {
     currentTransform = meshTransforms[0];
 }
 
-function initCubemapBuffers() {
-    cubeVertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
-    console.log("Cube Vertex Buffer Bound:", gl.getParameter(gl.ARRAY_BUFFER_BINDING));
-    console.log("Cube Vertex Buffer Data:", cubeVertices);
-}
+// function initCubemapBuffers() {
+//     cubeVertexBuffer = gl.createBuffer();
+//     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
+//     gl.bufferData(gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+//     console.log("Cube Vertex Buffer Bound:", gl.getParameter(gl.ARRAY_BUFFER_BINDING));
+//     console.log("Cube Vertex Buffer Data:", cubeVertices);
+// }
 
 function createCubeMap(gl, images) {
     const texture = gl.createTexture();
@@ -140,12 +140,10 @@ function loadCubeMap(gl, callback) {
         .catch(error => {
             console.error("Error loading cube map images:", error);
         });
-
-
 }
 
 /*
- * Initializing shaders 
+ * Initializing shaders
  */
 var shaderPrograms;
 var currentProgram;
@@ -192,7 +190,8 @@ function initShaders() {
         createShader("shader-vs", "shader-fs3-1"),
         createShader("shader-vs", "shader-fs3-2"),
         createShader("shader-vs", "shader-fs4"),
-        createShader("shader-vs", "shader-fs-metallic"), // 这里。。。。。。
+        createShader("shader-vs", "shader-fs-env"), // 8: Environment map
+        createShader("shader-vs", "shader-fs-metal")
     ];
     currentProgram = shaderPrograms[0];
 
@@ -221,11 +220,6 @@ function initShaders() {
     gl.uniform1f(shaderPrograms[7].iorUniform, 5.0);
     gl.uniform1f(shaderPrograms[7].betaUniform, 0.2);
 
-    //metal 这里！！！！！！！！！！！！！！！
-    shaderPrograms[8].exponentUniform = gl.getUniformLocation(shaderPrograms[8], "uExponent");
-    gl.useProgram(shaderPrograms[8]);
-    gl.uniform1f(shaderPrograms[8].exponentUniform, 50.0);
-
     // Initializing light source drawing shader
     lightProgram = createShaderProg("shader-vs-light", "shader-fs-light");
     lightProgram.vertexPositionAttribute = gl.getAttribLocation(lightProgram, "aVertexPosition");
@@ -243,7 +237,7 @@ function initBuffers() {
 }
 
 /*
- * Main rendering code 
+ * Main rendering code
  */
 
 // Basic rendering parameters
@@ -282,7 +276,7 @@ function setUniforms(prog) {
         gl.uniform1i(prog.environmentMapUniform, 0);
     }
     if (prog.useEnvironmentMapUniform) {
-        gl.uniform1i(prog.useEnvironmentMapUniform, drawCubemapBackground ? 1 : 0);
+        gl.uniform1i(prog.useEnvironmentMapUniform, 1);
     }
 }
 
@@ -290,27 +284,27 @@ var draw_light = false;
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.depthMask(false);
-    if (drawCubemapBackground && cubeMapTexture) {
-        gl.useProgram(shaderPrograms[shaderPrograms.length - 1]); // Use the last shader program
-        setUniforms(shaderPrograms[shaderPrograms.length - 1]);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
-        gl.vertexAttribPointer(
-            shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute,
-            3,
-            gl.FLOAT,
-            false,
-            0,
-            0
-        );
-        gl.enableVertexAttribArray(shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute);
-
-        // Render the cube
-        gl.drawArrays(gl.TRIANGLES, 0, 36);
-
-    }
-    gl.depthMask(true);
+    // gl.depthMask(false);
+    // if (drawCubemapBackground && cubeMapTexture) {
+    //     gl.useProgram(shaderPrograms[shaderPrograms.length - 1]); // Use the last shader program
+    //     setUniforms(shaderPrograms[shaderPrograms.length - 1]);
+    //
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
+    //     gl.vertexAttribPointer(
+    //         shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute,
+    //         3,
+    //         gl.FLOAT,
+    //         false,
+    //         0,
+    //         0
+    //     );
+    //     gl.enableVertexAttribArray(shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute);
+    //
+    //     // Render the cube
+    //     gl.drawArrays(gl.TRIANGLES, 0, 36);
+    //
+    // }
+    // gl.depthMask(true);
 
     mat4.perspective(35, gl.viewportWidth/gl.viewportHeight, 0.1, 1000.0, pMatrix);
 
@@ -318,7 +312,6 @@ function drawScene() {
     mat4.translate(lightMatrix, [0.0, -1.0, -7.0]);
     mat4.rotateX(lightMatrix, 0.3);
     mat4.rotateY(lightMatrix, rotY_light);
-
     lightPos.set([0.0, 2.5, 3.0]);
     mat4.multiplyVec3(lightMatrix, lightPos);
 
@@ -329,7 +322,7 @@ function drawScene() {
     mat4.multiply(mvMatrix, currentTransform);
 
     gl.useProgram(currentProgram);
-    setUniforms(currentProgram);   
+    setUniforms(currentProgram);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, currentMesh.vertexBuffer);
     gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, currentMesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -377,16 +370,11 @@ function tick() {
         const error = gl.getError(); // Check for WebGL errors
         if (error !== gl.NO_ERROR) {
             console.error("WebGL Error during rendering:", error);
-            //stopTick = true; // Stop rendering on error
         }
     } catch (error) {
         console.error("Error during rendering:", error);
-        //stopTick = true; // Stop rendering on error
     }
 }
-
-
-
 function webGLStart() {
     var canvas = $("#canvas0")[0];
 
@@ -394,7 +382,6 @@ function webGLStart() {
     initMesh();
     initShaders();
     initBuffers();
-    initCubemapBuffers();
 
     gl.clearColor(0.3, 0.3, 0.3, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -402,7 +389,6 @@ function webGLStart() {
     currentProgram = shaderPrograms[0];
     loadCubeMap(gl, function() {
         console.log("Cube map loaded successfully. Starting tick...");
-        tick(); // Only start the loop after the cube map is loaded
+        tick();
     });
-
 }

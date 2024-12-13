@@ -81,7 +81,7 @@
         varying vec3 vTexCoord;
 
         void main() {
-            vTexCoord = aVertexPosition; // Pass position as texture coordinates
+            vTexCoord = aVertexPosition;
             gl_Position = vec4(aVertexPosition, 1.0);
         }
 
@@ -97,22 +97,43 @@
             gl_FragColor = textureCube(uEnvironmentMap, normalize(vTexCoord));
         }
     </script>
+
+    <!-- Fragment shader: environment map only (option 8) -->
+    <script id="shader-fs-env" type="x-shader/x-fragment">
+        precision mediump float;
+        uniform samplerCube uEnvironmentMap;
+
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+
+        void main(void) {
+            // Reflect environment map
+            vec3 reflectedDir = reflect(normalize(vPosition), normalize(vNormal));
+            gl_FragColor = textureCube(uEnvironmentMap, reflectedDir);
+        }
+    </script>
+
+    <!-- Fragment shader: metal (option 9) -->
+    <script id="shader-fs-metal" type="x-shader/x-fragment">
+        precision mediump float;
+        uniform samplerCube uEnvironmentMap;
+
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+
+        void main(void) {
+            // Placeholder: Metallic reflection could be implemented here
+            vec3 reflectedDir = reflect(normalize(vPosition), normalize(vNormal));
+            gl_FragColor = textureCube(uEnvironmentMap, reflectedDir);
+        }
+    </script>
+
     <!-- Fragment shader: white -->
     <script id="shader-fs0" type="x-shader/x-fragment">
         precision mediump float;
-        uniform samplerCube uEnvironmentMap; // Cubemap texture
-        uniform bool useEnvironmentMap;     // Enable cubemap flag
-
-        varying vec3 vPosition;             // Vertex position (camera space)
-        varying vec3 vNormal;               // Vertex normal (camera space)
 
         void main(void) {
-            if (useEnvironmentMap) {
-                vec3 reflectedDir = reflect(normalize(vPosition), normalize(vNormal));
-                gl_FragColor = textureCube(uEnvironmentMap, reflectedDir);
-            } else {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // Default white
-            }
+            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
     </script>
 
@@ -242,7 +263,6 @@
         }
     </script>
 
-
     <!-- Fragment shader: Blinn-Phong model -->
     <script id="shader-fs3-2" type="x-shader/x-fragment">
         precision mediump float;
@@ -350,106 +370,6 @@
 
         }
     </script>
-
-
-    <!-- <script id="shader-fs-metallic" type="x-shader/x-fragment">
-        precision mediump float;
-    
-        uniform vec3 uLightPos;              // Light position in camera space
-        uniform float uLightPower;           // Light power
-        uniform vec3 uDiffuseColor;          // Diffuse color
-        uniform vec3 uSpecularColor;         // Specular color
-        uniform float uExponent;             // Phong exponent
-        uniform float uAmbient;              // Ambient
-        uniform samplerCube uEnvironmentMap; // Cube map texture
-        uniform bool useEnvironmentMap;      // Enable environment reflections
-    
-        varying vec3 vPosition;              // Fragment position (camera space)
-        varying vec3 vNormal;                // Fragment normal (camera space)
-    
-        void main(void) {
-            // Compute lighting
-            vec3 lightDirection = uLightPos - vPosition;
-            float lightDistance = length(lightDirection);
-            vec3 normalizedLightDir = normalize(lightDirection);
-            vec3 normalizedNormal = normalize(vNormal);
-            vec3 viewDirection = normalize(-vPosition);
-    
-            float I = uLightPower / (pow(lightDistance, 2.0) / 5.0 + 5.0);
-    
-            float diffuse = max(dot(normalizedNormal, normalizedLightDir), 0.0);
-            vec3 diffuseColor = uDiffuseColor * (I * diffuse + uAmbient);
-    
-            vec3 reflectionDirection = reflect(-normalizedLightDir, normalizedNormal);
-    
-            float specular = 0.0;
-            if (diffuse > 0.0) {
-                specular = pow(max(dot(viewDirection, reflectionDirection), 0.0), uExponent);
-            }
-    
-            vec3 specularColor = uSpecularColor * I * specular;
-    
-            // Add cube map reflection
-            vec3 envColor = vec3(0.0);
-            if (useEnvironmentMap) {
-                vec3 reflectedDir = reflect(-viewDirection, normalizedNormal);
-                envColor = textureCube(uEnvironmentMap, reflectedDir).rgb;
-            }
-    
-            // Combine Phong shading with cube map reflection
-            vec3 fragColor = diffuseColor + specularColor + envColor * 0.5; // Adjust reflection strength
-            gl_FragColor = vec4(fragColor, 1.0);
-        } -->
-    <script id="shader-fs-metallic" type="x-shader/x-fragment">
-        precision mediump float;
-    
-        uniform vec3 uLightPos;              // Light position in camera space
-        uniform float uLightPower;           // Light power
-        uniform vec3 uDiffuseColor;          // Diffuse color
-        uniform vec3 uSpecularColor;         // Specular color
-        uniform float uExponent;             // Phong exponent
-        uniform float uAmbient;              // Ambient
-        uniform samplerCube uEnvironmentMap; // Cube map texture
-        uniform bool useEnvironmentMap;      // Enable environment reflections
-    
-        varying vec3 vPosition;              // Fragment position (camera space)
-        varying vec3 vNormal;                // Fragment normal (camera space)
-    
-        void main(void) {
-            // Compute lighting
-            vec3 lightDirection = uLightPos - vPosition;
-            float lightDistance = length(lightDirection);
-            vec3 normalizedLightDir = normalize(lightDirection);
-            vec3 normalizedNormal = normalize(vNormal);
-            vec3 viewDirection = normalize(-vPosition);
-    
-            float I = uLightPower / (pow(lightDistance, 2.0) / 5.0 + 5.0);
-    
-            float diffuse = max(dot(normalizedNormal, normalizedLightDir), 0.0);
-            vec3 diffuseColor = uDiffuseColor * (I * diffuse + uAmbient);
-    
-            vec3 reflectionDirection = reflect(-normalizedLightDir, normalizedNormal);
-    
-            float specular = 0.0;
-            if (diffuse > 0.0) {
-                specular = pow(max(dot(viewDirection, reflectionDirection), 0.0), uExponent);
-            }
-    
-            vec3 specularColor = uSpecularColor * I * specular;
-    
-            // Add cube map reflection
-            vec3 envColor = vec3(0.0);
-            if (useEnvironmentMap) {
-                vec3 reflectedDir = reflect(-viewDirection, normalizedNormal);
-                envColor = textureCube(uEnvironmentMap, reflectedDir).rgb;
-            }
-    
-            // Combine Phong shading with cube map reflection
-            vec3 fragColor = diffuseColor + specularColor + envColor * 0.5; // Adjust reflection strength
-            gl_FragColor = vec4(fragColor, 1.0);
-        }
-        
-    </script>    
 </head>
 
 
@@ -457,8 +377,7 @@
 <body>
 <h1>CS112 Final Project - Advanced Shading</h1>
 <p>
-    Student name: <br>
-    Student ID:
+    Group member: <br>
 </p>
 
 <div class="droplist">
@@ -528,14 +447,15 @@
             <td>
                 <select onchange="changeActiveShader(this);">
                     <option value="0" selected="selected">Default: White</option>
-                    <option value="1">Task 1-1: Position</option>
-                    <option value="2">Task 1-2: Normal</option>
-                    <option value="3">Task 1-3: Lighting Dir.</option>
-                    <option value="4">Task 2: Diffuse Reflectance Model</option>
-                    <option value="5">Task 3-1: Phong Reflectance Model</option>
-                    <option value="6">Task 3-2: Blinn-Phong Reflectance Model</option>
-                    <option value="7">Task 4: (Isotropic) Microfacet Reflectance Model</option>
-                    <option value="8"> Metallic Reflectance Model</option>
+                    <option value="8">Environment map</option>
+                    <option value="9">Texture: Metal</option>
+                    <option value="1">Position</option>
+                    <option value="2">Normal</option>
+                    <option value="3">Lighting Dir.</option>
+                    <option value="4">Diffuse Reflectance Model</option>
+                    <option value="5">Phong Reflectance Model</option>
+                    <option value="6">Blinn-Phong Reflectance Model</option>
+                    <option value="7">Microfacet Reflectance Model</option>
                 </select>
             </td>
         </tr>
@@ -556,7 +476,7 @@
             <td>Ambient</td>
             <td>
                 <input type="range" min="0" max="50" value="10" onchange="updateSlider_Ambient(this.value);">
-                (<span id="sliderAmount_Ambient">0.1</span>)1
+                (<span id="sliderAmount_Ambient">0.1</span>)
             </td>
         </tr>
 
@@ -599,33 +519,6 @@
                 (<span id="sliderAmount_MicrofacetBeta">0.2</span>)
             </td>
         </tr>
-        
-
-<!-- 
-        <tr class="metallic-panel" style="display:none">
-            <td colspan="2"><hr><p>Shading Parameters (Metallic)</p></td>
-        </tr>
-        <tr class="metallic-panel" style="display:none">
-            <td>Index of Refraction</td>
-            <td>
-                <input id="sliderBar_MetallicIOR" type="range" min="20" max="100" value="50" onchange="updateSlider_MetallicIOR(this.value);">
-                (<span id="sliderAmount_MetallicIOR">5.0</span>)
-            </td>
-        </tr>
-        <tr class="metallic-panel" style="display:none">
-            <td>Beta (Roughness)</td>
-            <td>
-                <input id="sliderBar_MetallicBeta" type="range" min="5" max="50" value="20" onchange="updateSlider_MetallicBeta(this.value);">
-                (<span id="sliderAmount_MetallicBeta">0.2</span>)
-            </td>
-        </tr>
-        <tr class="metallic-panel" style="display:none">
-            <td>Enable Reflections</td>
-            <td>
-                <input type="checkbox" id="toggleEnvironmentMap" onchange="toggleEnvironmentMap(this.checked);"> Use Environment Map
-            </td>
-        </tr> -->
-        
     </table>
 </div>
 <div style="clear:left"></div>
