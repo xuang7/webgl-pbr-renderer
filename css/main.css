@@ -1,33 +1,81 @@
-body, p, table {
-	font-family: Verdana, Geneva, 'DejaVu Sans', sans-serif;
-	font-size: 14px;
+:root {
+	/* Typography */
+	--font-family-base: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	--font-size-base: 16px;
+	--line-height-base: 1.6;
+
+	/* Colors */
+	--color-text: #333;
+	--color-border: #9ac17a;       /* Greenish border color */
+	--color-background: #eaf4e8;   /* Light green background */
+	--color-panel-bg: #fff;        /* White panel background */
+	--color-panel-border: #cbe3b8; /* Light greenish border for panels */
+
+	/* Spacing */
+	--spacing-xs: 4px;
+	--spacing-sm: 8px;
+	--spacing-md: 16px;
+	--spacing-lg: 24px;
+
+	/* Border radius for a friendlier look */
+	--border-radius: 10px;
 }
 
-div.droplist {
-	margin-top: 10px;
+body {
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-base);
+	line-height: var(--line-height-base);
+	color: var(--color-text);
+	margin: 0;
+	padding: var(--spacing-lg);
+	background-color: var(--color-background);
 }
 
-div.panel {
-	margin-top: 10px;
-	padding: 5px;
-	border: 2px solid #666;
-	background: #eee;
-	float: left;
-}
-
-div.panel p {
-	font-weight: bold;
-	margin: 5px 0 5px 0;
+p, table {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	margin: 0;
 	padding: 0;
 }
 
-div.panel hr {
-	border: 0;
-  	height: 1px;
-    background: #333;
-    margin: 0 0 10px 0;
+table {
+	border-collapse: collapse;
 }
 
-td {
-	padding: 3px 0 3px 0;
+/* Drop list container */
+.droplist {
+	margin-top: var(--spacing-md);
 }
+
+/* Panel styling */
+.panel {
+	margin-top: var(--spacing-md);
+	padding: var(--spacing-md);
+	border: 1px solid var(--color-panel-border);
+	background-color: var(--color-panel-bg);
+	display: inline-block;
+	vertical-align: top;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.panel p {
+	font-weight: 600;
+	margin: var(--spacing-sm) 0;
+	padding: 0;
+}
+
+.panel hr {
+	border: none;
+	height: 1px;
+	background: var(--color-border);
+	margin: var(--spacing-md) 0;
+}
+
+/* Table cell spacing */
+td {
+	padding: var(--spacing-xs) 0;
+}
+
+
