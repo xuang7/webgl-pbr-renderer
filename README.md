@@ -82,14 +82,29 @@ we significantly improved visual fidelity. The refined user interface further en
 1. Clone the repository:
  ```bash
  git clone https://github.com/xuang7/112finalproject.git
+ ```bash
  cd 112finalproject
+ ```bash
  python -m http.server 8000
+ ```bash
  http://localhost:8000
 
+---
+##Library and Resources
+### Library
+- **[gl-matrix](https://github.com/toji/gl-matrix):** A high-performance matrix and vector math library for JavaScript, utilized extensively in our rendering system for transformations and calculations.
+
+### Models
+- **Sphere model:** [MIT Web Logo Shapes](https://web.mit.edu/djwendel/www/weblogo/shapes/)
+- **Not Used:** [Casual Effects Model Repository](https://casual-effects.com/data/)
+
+### Cubemap
+- **Yokohama2:** [Humus - Yokohama2](https://www.humus.name/index.php?page=Textures)
+
+Special thanks to course instructors and open-source communities for providing valuable resources and support for our project.
 
 Library: gl-matrix
 model:
 have not used: https://casual-effects.com/data/
 sphere: https://web.mit.edu/djwendel/www/weblogo/shapes/
-
 cubemap: https://www.humus.name/index.php?page=Textures Yokohama2
