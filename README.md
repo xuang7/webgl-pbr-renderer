@@ -94,7 +94,6 @@ Special thanks to course instructors and open-source communities for providing v
 
 
 ## How to Run
-1. Clone the repository:
  ```bash
  git clone https://github.com/xuang7/112finalproject.git
  cd 112finalproject
