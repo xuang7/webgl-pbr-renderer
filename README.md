@@ -92,11 +92,6 @@ we significantly improved visual fidelity. The refined user interface further en
 
 Special thanks to course instructors and open-source communities for providing valuable resources and support for our project.
 
-Library: gl-matrix
-model:
-have not used: https://casual-effects.com/data/
-sphere: https://web.mit.edu/djwendel/www/weblogo/shapes/
-cubemap: https://www.humus.name/index.php?page=Textures Yokohama2
 
 ## How to Run
 1. Clone the repository:
