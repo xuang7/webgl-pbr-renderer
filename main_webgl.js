@@ -2,18 +2,42 @@
  * Initializing GL object
  */
 var gl;
-//var drawCubemapBackground = true; // Enable cubemap background rendering by default
-//var cubeVertexBuffer;
 var cubeMapTexture;
-// var cubeVertices = new Float32Array([
-//     -1, -1, -1,  1, -1, -1,  1,  1, -1, -1,  1, -1, // Back face
-//     -1, -1,  1, -1,  1,  1,  1,  1,  1,  1, -1,  1, // Front face
-//     -1,  1, -1, -1,  1,  1,  1,  1,  1,  1,  1, -1, // Top face
-//     -1, -1, -1,  1, -1, -1,  1, -1,  1, -1, -1,  1, // Bottom face
-//     1, -1, -1,  1,  1, -1,  1,  1,  1,  1, -1,  1, // Right face
-//     -1, -1, -1, -1, -1,  1, -1,  1,  1, -1,  1, -1  // Left face
-// ]);
+const yokohamaSources = [
+    './Yokohama2/posx.jpg',
+    './Yokohama2/negx.jpg',
+    './Yokohama2/posy.jpg',
+    './Yokohama2/negy.jpg',
+    './Yokohama2/posz.jpg',
+    './Yokohama2/negz.jpg'
+];
 
+const lyckSources = [
+    './Lycksele/posx.jpg',
+    './Lycksele/negx.jpg',
+    './Lycksele/posy.jpg',
+    './Lycksele/negy.jpg',
+    './Lycksele/posz.jpg',
+    './Lycksele/negz.jpg'
+];
+
+const palmSources = [
+    './PalmTrees/posx.jpg',
+    './PalmTrees/negx.jpg',
+    './PalmTrees/posy.jpg',
+    './PalmTrees/negy.jpg',
+    './PalmTrees/posz.jpg',
+    './PalmTrees/negz.jpg'
+];
+
+const mountainSources = [
+    './Maskonaive/posx.jpg',
+    './Maskonaive/negx.jpg',
+    './Maskonaive/posy.jpg',
+    './Maskonaive/negy.jpg',
+    './Maskonaive/posz.jpg',
+    './Maskonaive/negz.jpg'
+];
 function initGL(canvas) {
     try {
         gl = canvas.getContext("experimental-webgl");
@@ -104,16 +128,7 @@ function createCubeMap(gl, images) {
 }
 
 // Usage example
-function loadCubeMap(gl, callback) {
-    const imageSources = [
-        './Yokohama2/posx.jpg',   // Positive X
-        './Yokohama2/negx.jpg',    // Negative X
-        './Yokohama2/posy.jpg',     // Positive Y
-        './Yokohama2/negy.jpg',  // Negative Y
-        './Yokohama2/posz.jpg',   // Positive Z
-        './Yokohama2/negz.jpg'     // Negative Z
-    ];
-
+function loadCubeMap(gl, imageSources, callback) {
     // Create image elements
     const images = imageSources.map(src => {
         const img = new Image();
@@ -135,7 +150,7 @@ function loadCubeMap(gl, callback) {
                 return; // Do not start rendering if cube map fails
             }
 
-            callback(); // Start the tick loop
+            if (callback) callback(); // e.g. Start the tick loop if needed
         })
         .catch(error => {
             console.error("Error loading cube map images:", error);
@@ -295,27 +310,6 @@ var draw_light = false;
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // gl.depthMask(false);
-    // if (drawCubemapBackground && cubeMapTexture) {
-    //     gl.useProgram(shaderPrograms[shaderPrograms.length - 1]); // Use the last shader program
-    //     setUniforms(shaderPrograms[shaderPrograms.length - 1]);
-    //
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
-    //     gl.vertexAttribPointer(
-    //         shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute,
-    //         3,
-    //         gl.FLOAT,
-    //         false,
-    //         0,
-    //         0
-    //     );
-    //     gl.enableVertexAttribArray(shaderPrograms[shaderPrograms.length - 1].vertexPositionAttribute);
-    //
-    //     // Render the cube
-    //     gl.drawArrays(gl.TRIANGLES, 0, 36);
-    //
-    // }
-    // gl.depthMask(true);
 
     mat4.perspective(35, gl.viewportWidth/gl.viewportHeight, 0.1, 1000.0, pMatrix);
 
@@ -398,7 +392,7 @@ function webGLStart() {
     gl.enable(gl.DEPTH_TEST);
 
     currentProgram = shaderPrograms[0];
-    loadCubeMap(gl, function() {
+    loadCubeMap(gl, yokohamaSources, function() {
         console.log("Cube map loaded successfully. Starting tick...");
         tick();
     });

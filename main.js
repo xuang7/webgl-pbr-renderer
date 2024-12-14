@@ -66,6 +66,31 @@ function changeResolution(sel) {
         gl.viewportHeight = height;
     }
 }
+function changeActiveCubemap(sel) {
+    var id = parseInt(sel.value, 10);
+
+    let chosenSources;
+    if (id === 0) {
+        chosenSources = yokohamaSources;
+    } else if (id === 1) {
+        chosenSources = lyckSources;
+    }else if(id === 2){
+        chosenSources = palmSources;
+
+    }else if(id === 3){
+        chosenSources = mountainSources;
+    }
+    else {
+        // Add more environment sets as needed
+        chosenSources = yokohamaSources;
+    }
+
+    loadCubeMap(gl, chosenSources, function() {
+        console.log("Cubemap changed successfully.");
+        // Optionally re-render or update something
+    });
+}
+
 
 /*
  * Slider bar handlers

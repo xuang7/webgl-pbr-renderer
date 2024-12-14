@@ -33,8 +33,8 @@ This diversity demonstrates the robustness of our rendering pipeline across diff
 ---
 
 ### II. Cubemap Implementation: Simulating Realistic Environments
-- **High-resolution cubemap**: Provides a panoramic background for enhanced immersion.
-- **Environmental reflections**: Applied cubemap textures to reflective models, adding depth and realism.
+- **High-resolution cubemap**:  Users can choose from multiple high-resolution cubemaps, providing a panoramic background that suits different moods and environments, thus enhancing the overall immersive experience.
+- **Environmental reflections**: The selected cubemap texture is applied to reflective models, adding depth and realism.
 - **Dynamic lighting**: Seamlessly integrates with cubemap reflections, improving overall scene fidelity.
 
 ---
@@ -58,7 +58,6 @@ Our metallic rendering features:
 - **Specular reflections**: Based on the Phong reflection model:
 - **Cubemap integration**: Adds realistic environment reflections:
 
-
 ---
 
 ### IV. User-Friendly Interface
@@ -71,7 +70,7 @@ Our metallic rendering features:
 ## Conclusion
 This project demonstrates the integration of **dynamic lighting**, **environment mapping**, and **advanced material rendering techniques** in an interactive 3D environment. By:
 - Diversifying geometric models,
-- Applying realistic cubemap reflections, and
+- Applying realistic cubemap reflections,
 - Implementing matte porcelain and metallic materials,
 
 we significantly improved visual fidelity. The refined user interface further enriches the interactive experience, making this a comprehensive and engaging rendering system.
@@ -85,11 +84,13 @@ we significantly improved visual fidelity. The refined user interface further en
 
 ### Models
 - **Sphere model:** [MIT Web Logo Shapes](https://web.mit.edu/djwendel/www/weblogo/shapes/)
-- **Not Used:** [Casual Effects Model Repository](https://casual-effects.com/data/)
+- **Rock model:** [Casual Effects Model Repository](https://casual-effects.com/data/)
 
 ### Cubemap
 - **Yokohama2:** [Humus - Yokohama2](https://www.humus.name/index.php?page=Textures)
-
+- **Lycksele:** [Humus - Lycksele](https://www.humus.name/index.php?page=Cubemap&item=Lycksele)
+- **Palm tree:** [Humus - Palmtrees](https://www.humus.name/index.php?page=Cubemap&item=PalmTrees)
+- **Mountain:** [Humus - Maskonaive](https://www.humus.name/index.php?page=Cubemap&item=Maskonaive)
 Special thanks to course instructors and open-source communities for providing valuable resources and support for our project.
 
 

@@ -485,7 +485,7 @@
 <body>
 <h1>CS112 Final Project - Advanced Shading</h1>
 <p>
-    Group member: Xuan Gu, Jiatong Liu <br>
+    Group member: Xuan Gu (92327376), Jiatong Liu (51549174) <br>
 </p>
 
 <div class="droplist">
@@ -506,6 +506,16 @@
               <option value="2">960x540</option>
             </select>
         </span>
+    <!-- New dropdown for cubemap selection -->
+    <span style="margin-left:30px">
+        Environment Map:
+        <select onchange="changeActiveCubemap(this);">
+          <option value="0" selected="selected">City: Yokohama</option>
+          <option value="1">Lake: Lycksele</option>
+          <option value="2">Beach: Palm trees</option>
+          <option value="3">Mountain: Maskonaive</option>
+        </select>
+    </span>
 
     <table>
         <tr>
