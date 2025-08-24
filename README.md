@@ -1,25 +1,13 @@
-# 112 Final Project - Material Rendering
-
-## Group Members
-- Xuan Gu
-- Jiatong (Betty) Liu
-
-## GitHub Repository
-[Project Repository](https://github.com/xuang7/112finalproject?tab=readme-ov-file#readme)
-
----
+# Physically-Based Material Rendering
+Interactive WebGL demo featuring dynamic lighting, HDR environment maps, and PBR porcelain / metal shaders.
 
 ## Project Overview
-Our final project focuses on creating an **interactive 3D rendering environment** that integrates:
+We built an **interactive 3D rendering environment** that integrates:
 - Dynamic lighting
 - Environment mapping
 - Advanced material models
 
 This work builds upon foundational concepts introduced earlier in the course. We expanded our scene to include diverse geometries, employed a **cubemap** for realistic environments, and implemented sophisticated shading techniques for physically plausible materials such as matte porcelain and metallic surfaces. 
-
-This README highlights our progress, technical methods, challenges faced, and the resulting visual fidelity.
-
----
 
 ## Features
 
@@ -30,14 +18,10 @@ To showcase the rendering system's capabilities, we:
 
 This diversity demonstrates the robustness of our rendering pipeline across different shapes and textures.
 
----
-
 ### II. Cubemap Implementation: Simulating Realistic Environments
 - **High-resolution cubemap**:  Users can choose from multiple high-resolution cubemaps, providing a panoramic background that suits different moods and environments, thus enhancing the overall immersive experience.
 - **Environmental reflections**: The selected cubemap texture is applied to reflective models, adding depth and realism.
 - **Dynamic lighting**: Seamlessly integrates with cubemap reflections, improving overall scene fidelity.
-
----
 
 ### III. Material Rendering Techniques
 
@@ -58,14 +42,10 @@ Our metallic rendering features:
 - **Specular reflections**: Based on the Phong reflection model:
 - **Cubemap integration**: Adds realistic environment reflections:
 
----
-
 ### IV. User-Friendly Interface
 - Dynamic lighting and color adjustments from previous work were refined.
 - Enhanced user interface for easier texture manipulation and parameter adjustments.
 - Interactive controls allow real-time exploration of material and environmental settings.
-
----
 
 ## Conclusion
 This project demonstrates the integration of **dynamic lighting**, **environment mapping**, and **advanced material rendering techniques** in an interactive 3D environment. By:
@@ -74,9 +54,6 @@ This project demonstrates the integration of **dynamic lighting**, **environment
 - Implementing matte porcelain and metallic materials,
 
 we significantly improved visual fidelity. The refined user interface further enriches the interactive experience, making this a comprehensive and engaging rendering system.
-
----
-
 
 ## Library and Resources
 ### Library
@@ -91,14 +68,13 @@ we significantly improved visual fidelity. The refined user interface further en
 - **Lycksele:** [Humus - Lycksele](https://www.humus.name/index.php?page=Cubemap&item=Lycksele)
 - **Palm tree:** [Humus - Palmtrees](https://www.humus.name/index.php?page=Cubemap&item=PalmTrees)
 - **Mountain:** [Humus - Maskonaive](https://www.humus.name/index.php?page=Cubemap&item=Maskonaive)
+
 Special thanks to course instructors and open-source communities for providing valuable resources and support for our project.
 
 
 ## How to Run
  ```bash
- git clone https://github.com/xuang7/112finalproject.git
- cd 112finalproject
- python -m http.server 8000
- http://localhost:8000```
-
----
+ git clone (this project)
+ cd 
+ python -m http.server 8000 # or any static server
+ # open http://localhost:8000```
